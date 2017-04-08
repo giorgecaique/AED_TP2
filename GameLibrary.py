@@ -1,10 +1,11 @@
 import pygame, sys
 from Library import *
-from DataStructures import *
+from BulletList import *
 from Process import *
+from IOController import *
+from LogQueue import *
 
 class BaseClass(pygame.sprite.Sprite):
-
     allsprites = pygame.sprite.Group()
     def __init__(self, x, y, widht, height, image_string):
         pygame.sprite.Sprite.__init__(self)
@@ -18,25 +19,31 @@ class BaseClass(pygame.sprite.Sprite):
         self.height = height
 
 class MillenniumFalcon(BaseClass):
-    List = pygame.sprite.Group()
-    speed = 3
+    speed = 5
     direction = "up"
     def __init__(self, x, y, widht, height, image_string):
         BaseClass.__init__(self, x, y, widht, height, image_string)
-        MillenniumFalcon.List.add(self)
 
-    def WallControl(self, WIDHT, HEIGHT):
+    def WallControl(self, WIDHT, HEIGHT, score):
         if self.rect.x < 0:
-            Exit()
-        elif self.rect.x + self.widht > WIDHT - 220:
-            Exit()
+            item = Item('game over - wall contact')
+            logInsert(item)
+            Exit(score)
+        elif self.rect.x > WIDHT - self.widht:
+            item = Item('game over - wall contact')
+            logInsert(item)
+            Exit(score)
         if self.rect.y < 0:
-            Exit()
-        elif self.rect.y + self.height > HEIGHT - 190:
-            Exit()
+            item = Item('game over - wall contact')
+            logInsert(item)
+            Exit(score)
+        elif self.rect.y > HEIGHT - self.height:
+            item = Item('game over - wall contact')
+            logInsert(item)
+            Exit(score)
 
-    def Motion(self, WIDHT, HEIGHT):
-        self.WallControl(WIDHT, HEIGHT)
+    def Motion(self, WIDHT, HEIGHT, score):
+        self.WallControl(WIDHT, HEIGHT, score)
 
         if self.direction == "up":
             self.rect.y -= self.speed
@@ -54,13 +61,32 @@ class MillenniumFalcon(BaseClass):
         self.direction = direction
 
 class Bullet(BaseClass):
+    bulletList = BulletList()
     def __init__(self, x, y, widht, height, image_string):
         BaseClass. __init__(self, x, y, widht, height, image_string)
+        item = Item(self)
+        Bullet.bulletList.Add(item)
+
+    def kill(self):
+        BaseClass.allsprites.remove(self)
+        self.rect.x = -1
+        self.rect.y = -1
+        item = Item('eated '+ str(self.__class__.__name__))
+        logInsert(item)
 
 class SpaceFuel(Bullet):
     def __init__(self, x, y, widht, height, image_string):
         Bullet.__init__(self, x, y, widht, height, image_string)
 
+    def Create(self):
+        fuel = SpaceFuel(randint(0,1366), randint(0, 768), 30, 30, "Resources/fuel.png")
+
 class Asteroid(Bullet):
     def __init__(self, x, y, widht, height, image_string):
         Bullet.__init__(self, x, y, widht, height, image_string)
+
+def texts(screen, timer):
+    pygame.font.init()
+    font = pygame.font.SysFont("04b",30)
+    scoretext = font.render("Timer: "+str(timer), 1,(255,255,255))
+    screen.blit(scoretext, (1100, 50))

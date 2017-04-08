@@ -1,0 +1,15 @@
+created Asteroid
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+eated SpaceFuel
+eated SpaceFuel
+created Asteroid
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+created SpaceFuel
+game over - wall contact
